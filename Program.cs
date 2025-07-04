@@ -1,5 +1,9 @@
 using EmpleadosApi.Data;
 using Microsoft.EntityFrameworkCore;
+using ApiEmpleados_Backend.Application.Services;
+using ApiEmpleados_Backend.Domain.Ports;
+using ApiEmpleados_Backend.Hubs;
+using ApiEmpleados_Backend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +14,11 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IMessageRepository, FileMessageRepository>();
+builder.Services.AddScoped<ChatService>();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -22,7 +31,8 @@ builder.Services.AddCors(options =>
         {
             builder.WithOrigins("http://localhost:4200") // URL de tu app Angular
                    .AllowAnyHeader()
-                   .AllowAnyMethod();
+                   .AllowAnyMethod()
+                   .AllowCredentials();
         });
 });
 
@@ -45,6 +55,7 @@ app.UseCors("AllowAngularApp"); // Habilitar CORS
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
 
 // Inicializar la base de datos
 using (var scope = app.Services.CreateScope())
