@@ -39,6 +39,9 @@ namespace ApiEmpleados_Backend.Controllers
                     return Conflict("A user with this email already exists.");
                 }
 
+                // Asignar un nombre por defecto si es nulo
+                user.Name = user.Name ?? "Default Name";
+                // Aquí deberías hashear la contraseña antes de guardarla
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
                 
