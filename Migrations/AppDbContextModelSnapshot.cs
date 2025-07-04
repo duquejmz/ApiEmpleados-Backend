@@ -22,6 +22,59 @@ namespace EmpleadosApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ApiEmpleados_Backend.Domain.Entities.Room", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("ApiEmpleados_Backend.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("EmpleadosApi.Models.Empleado", b =>
                 {
                     b.Property<int>("Id")
@@ -56,6 +109,34 @@ namespace EmpleadosApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Empleados");
+                });
+
+            modelBuilder.Entity("ApiEmpleados_Backend.Domain.Entities.Room", b =>
+                {
+                    b.HasOne("ApiEmpleados_Backend.Domain.Entities.User", "Creator")
+                        .WithMany("CreatedRooms")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("ApiEmpleados_Backend.Domain.Entities.User", b =>
+                {
+                    b.HasOne("ApiEmpleados_Backend.Domain.Entities.Room", null)
+                        .WithMany("Users")
+                        .HasForeignKey("RoomId");
+                });
+
+            modelBuilder.Entity("ApiEmpleados_Backend.Domain.Entities.Room", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ApiEmpleados_Backend.Domain.Entities.User", b =>
+                {
+                    b.Navigation("CreatedRooms");
                 });
 #pragma warning restore 612, 618
         }
